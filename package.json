@@ -1,0 +1,36 @@
+{
+  "name": "mengwang",
+  "version": "0.6.1",
+  "description": "Node.js SDK for mengwang sms gateway.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/soulwu/mengwang.git"
+  },
+  "keywords": [
+    "mengwang",
+    "梦网",
+    "sms",
+    "短信"
+  ],
+  "author": "soulwu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/soulwu/mengwang/issues"
+  },
+  "homepage": "https://github.com/soulwu/mengwang#readme",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "dependencies": {
+    "lodash": "^3.10.1",
+    "q": "^1.4.1",
+    "soap": "^0.11.0"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.10.0"
+  }
+}
