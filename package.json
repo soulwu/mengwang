@@ -1,14 +1,14 @@
 {
   "name": "mengwang",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "Node.js SDK for mengwang sms gateway.",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "prepublish": "npm run clean && npm test && npm run build",
     "pretest": "npm run lint",
     "test": "mocha",
-    "build": "babel src --out-dir build",
-    "clean": "rimraf build",
+    "build": "babel src --out-dir lib",
+    "clean": "rimraf lib",
     "lint": "eslint src test"
   },
   "repository": {
@@ -31,24 +31,22 @@
     "node": ">=0.10"
   },
   "dependencies": {
-    "lodash": "^4.1.0",
+    "lodash": "^4.13.1",
     "q": "^1.4.1",
-    "soap": "^0.11.4",
-    "validator": "^4.5.1"
+    "soap": "^0.15.0",
+    "validator": "^4.9.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.4.5",
-    "babel-core": "^6.4.5",
-    "babel-eslint": "^4.1.8",
-    "babel-preset-es2015": "^6.3.13",
-    "babel-preset-stage-0": "^6.3.13",
-    "babel-register": "^6.4.3",
+    "babel-cli": "^6.10.1",
+    "babel-core": "^6.9.1",
+    "babel-eslint": "^6.0.4",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-stage-0": "^6.5.0",
+    "babel-register": "^6.9.0",
     "chai": "^3.5.0",
-    "eslint": "^1.10.3",
-    "eslint-config-airbnb": "^5.0.1",
-    "eslint-config-cfp": "^1.2.0",
-    "eslint-plugin-react": "^3.16.1",
-    "mocha": "^2.4.5",
-    "rimraf": "^2.5.1"
+    "eslint": "^2.12.0",
+    "eslint-config-cfp": "^1.8.0",
+    "mocha": "^2.5.3",
+    "rimraf": "^2.5.2"
   }
 }

@@ -1,4 +1,4 @@
-/* eslint new-cap:0 */
+/* eslint camelcase:0 */
 
 import soap from 'soap';
 import Q from 'q';

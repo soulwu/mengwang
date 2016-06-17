@@ -1,3 +1,4 @@
 {
-  "extends": "cfp"
+  "extends": "eslint-config-cfp/node",
+  "parser": "babel-eslint"
 }
