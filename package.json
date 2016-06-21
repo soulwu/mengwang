@@ -3,8 +3,7 @@
   "description": "Node.js SDK for mengwang sms gateway.",
   "main": "lib/index.js",
   "scripts": {
-    "prepublish": "npm run clean && npm test && npm run build",
-    "pretest": "npm run lint",
+    "prepublish": "npm run build",
     "test": "mocha",
     "build": "babel src --out-dir lib",
     "clean": "rimraf lib",

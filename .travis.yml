@@ -11,6 +11,10 @@ before_install:
   - npm i -g npm@^3.0.0
 before_script:
   - npm prune
+  - npm run clean
+script:
+  - npm run lint
+  - npm test
 after_success:
   - npm run semantic-release
 branches:
