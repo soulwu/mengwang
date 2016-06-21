@@ -1,6 +1,5 @@
 {
   "name": "mengwang",
-  "version": "1.4.0",
   "description": "Node.js SDK for mengwang sms gateway.",
   "main": "lib/index.js",
   "scripts": {
@@ -9,11 +8,12 @@
     "test": "mocha",
     "build": "babel src --out-dir lib",
     "clean": "rimraf lib",
-    "lint": "eslint src test"
+    "lint": "eslint src test",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/soulwu/mengwang.git"
+    "url": "https://github.com/soulwu/mengwang.git"
   },
   "keywords": [
     "mengwang",
@@ -48,6 +48,7 @@
     "eslint": "^2.12.0",
     "eslint-config-cfp": "^1.8.0",
     "mocha": "^2.5.3",
-    "rimraf": "^2.5.2"
+    "rimraf": "^2.5.2",
+    "semantic-release": "^4.3.5"
   }
 }
