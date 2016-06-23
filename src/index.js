@@ -1,10 +1,7 @@
 /* eslint camelcase:0 */
 
 import soap from 'soap';
-import Q from 'q';
-import defaults from 'lodash/defaults';
-import noop from 'lodash/noop';
-import isArray from 'lodash/isArray';
+import _ from 'lodash';
 import {isMobilePhone} from 'validator';
 
 class Mengwang {
@@ -59,90 +56,101 @@ class Mengwang {
     wsdl: 'http://61.145.229.29:9006/MWGate/wmgw.asmx?wsdl',
     pszSubPort: '*',
     debug: process.env.NODE_DEBUG && /\bmengwang\b/.test(process.env.NODE_DEBUG),
-    logger: noop
+    logger: _.noop
   };
 
   constructor(options) {
-    this.options = defaults({}, options, Mengwang.defaultOptions);
-    this.deferClient = Q.nfcall(soap.createClient, this.options.wsdl, {
-      wsdl_options: {
-        proxy: this.options.proxy,
-        timeout: this.options.timeout
-      }
+    this.options = _.defaults({}, options, Mengwang.defaultOptions);
+    this.deferClient = new Promise((resolve, reject) => {
+      soap.createClient(this.options.wsdl, {
+        wsdl_options: {
+          proxy: this.options.proxy,
+          timeout: this.options.timeout
+        }
+      }, (err, client) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(client);
+      });
     });
   }
 
   sendSms(mobiles, content) {
-    const deferred = Q.defer();
     let mobileArr;
-    if (isArray(mobiles)) {
+    if (_.isArray(mobiles)) {
       mobileArr = mobiles;
     } else {
       mobileArr = [mobiles];
     }
 
     if (mobileArr.length === 0 || !content) {
-      return deferred.reject('mobile or content empty');
+      return Promise.reject('mobile or content empty');
     }
 
     for (const mobile of mobileArr) {
       if (!isMobilePhone(mobile, 'zh-CN')) {
-        return deferred.reject('mobile invalid');
+        return Promise.reject('mobile invalid');
       }
     }
 
     let logMsg = '';
     if (this.options.debug) {
       mobileArr.forEach((mobile, i) => {
-        logMsg = `${logMsg}mobile${i + 1}[${mobile}] `;
+        logMsg = ` ${logMsg}mobile${i + 1}[${mobile}] content[${content}]`;
       });
     }
 
-    logMsg = `${logMsg}content[${content.substr(0, 30)}]`;
-
-    this.deferClient.then((client) => {
-      this.options.logger(`Call mengwang sendSms. ${logMsg}`);
+    return this.deferClient.then((client) => {
+      this.options.logger(`Call mengwang sendSms.${logMsg}`);
       const startTime = Date.now();
-      client.MongateCsSpSendSmsNew({
-        userId: this.options.username,
-        password: this.options.userpass,
-        pszMobis: mobileArr.join(','),
-        pszMsg: content,
-        iMobiCount: mobileArr.length,
-        pszSubPort: this.options.pszSubPort
-      }, (err, result) => {
-        this.options.logger(`Call mengwang complete. elapsedTime[${Date.now() - startTime}] ${logMsg}`);
-        if (err) {
-          this.options.logger(`Call mengwang sendSms failed. err[${err}] ${logMsg}`);
-          deferred.reject(err);
-          return;
-        }
-        let response = result;
-        if (isArray(result)) {
-          response = result[0];
-        }
-        logMsg = `${logMsg} result[${JSON.stringify(response)}]`;
-        if (response && Math.abs(response.MongateCsSpSendSmsNewResult) > 999) {
-          this.options.logger(`Call mengwang sendSms succ. ${logMsg}`);
-          deferred.resolve(response.MongateCsSpSendSmsNewResult);
-        } else {
-          let errMsg = 'unknow error';
-          if (response && Mengwang.errMap[response.MongateCsSpSendSmsNewResult]) {
-            errMsg = Mengwang.errMap[response.MongateCsSpSendSmsNewResult];
-          }
-          this.options.logger(`Call mengwang sendSms err. err[${errMsg}] ${logMsg}`);
-          deferred.reject(errMsg);
-        }
-      }, {
-        proxy: this.options.proxy,
-        timeout: this.options.timeout
-      });
-    }).catch((err) => {
-      this.options.logger(`Get mengwang client failed. err[${err}] ${logMsg}`);
-      deferred.reject(err);
-    });
 
-    return deferred.promise;
+      return new Promise((resolve, reject) => {
+        client.MongateCsSpSendSmsNew({
+          userId: this.options.username,
+          password: this.options.userpass,
+          pszMobis: mobileArr.join(','),
+          pszMsg: content,
+          iMobiCount: mobileArr.length,
+          pszSubPort: this.options.pszSubPort
+        }, (err, result) => {
+          this.options.logger(`Call mengwang complete. elapsedTime[${Date.now() - startTime}]${logMsg}`);
+          if (err) {
+            this.options.logger(`Call mengwang sendSms failed. err[${err.message}]${logMsg}`);
+            reject(err);
+            return;
+          }
+          let response = result;
+          if (_.isArray(result)) {
+            response = result[0];
+          }
+
+          if (this.options.debug) {
+            logMsg = `${logMsg} result[${JSON.stringify(response)}]`;
+          }
+
+          if (response && Math.abs(response.MongateCsSpSendSmsNewResult) > 999) {
+            this.options.logger(`Call mengwang sendSms succ.${logMsg}`);
+            resolve(response.MongateCsSpSendSmsNewResult);
+          } else {
+            let errMsg = 'unknow error';
+            if (response && Mengwang.errMap[response.MongateCsSpSendSmsNewResult]) {
+              errMsg = Mengwang.errMap[response.MongateCsSpSendSmsNewResult];
+            }
+            this.options.logger(`Call mengwang sendSms err. err[${errMsg}]${logMsg}`);
+            reject(errMsg);
+          }
+        }, {
+          proxy: this.options.proxy,
+          timeout: this.options.timeout
+        });
+      });
+    }, (e) => {
+      this.options.logger(`Get mengwang client failed. err[${e.message}]${logMsg}`);
+      throw e;
+    });
   }
 }
 

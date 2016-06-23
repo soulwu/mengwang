@@ -86,10 +86,6 @@ Send sms `content` to `mobile`
 | mobile     | string/array | User's mobile to receive sms          | required    |
 | content    | string       | Token played                          | required    |
 
-ChangeLog
----------
-[Change Log](CHANGELOG.md)
-
 License
 -------
 

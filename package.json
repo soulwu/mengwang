@@ -27,11 +27,10 @@
   },
   "homepage": "https://github.com/soulwu/mengwang#readme",
   "engines": {
-    "node": ">=0.10"
+    "node": ">=4"
   },
   "dependencies": {
     "lodash": "^4.13.1",
-    "q": "^1.4.1",
     "soap": "^0.15.0",
     "validator": "^4.9.0"
   },
