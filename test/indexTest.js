@@ -6,8 +6,8 @@ describe('mengwang', () => {
     const instance = new Mengwang({
       wsdl: 'abc'
     });
-    it('should set wsdl to default value', () => {
-      expect(instance.options.debug).to.equal(Mengwang.defaultOptions.debug);
+    it('should set debug to default value', () => {
+      expect(instance.options.debug).to.equal(process.env.NODE_DEBUG && /\bmengwang\b/.test(process.env.NODE_DEBUG));
     });
   });
 });
