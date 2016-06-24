@@ -49,21 +49,32 @@ class Mengwang {
     '-10033': '非法关键词'
   };
 
-  static defaultOptions = {
-    debug: process.env.NODE_DEBUG && /\bmengwang\b/.test(process.env.NODE_DEBUG),
-    logger: _.noop
-  };
-
-  constructor(options) {
-    this.options = _.defaults({}, options, Mengwang.defaultOptions);
+  constructor({
+    wsdl,
+    pszSubPort,
+    username,
+    userpass,
+    proxy,
+    timeout,
+    debug = process.env.NODE_DEBUG && /\bmengwang\b/.test(process.env.NODE_DEBUG),
+    logger = _.noop
+  }) {
+    this._pszSubPort = pszSubPort;
+    this._username = username;
+    this._userpass = userpass;
+    this._proxy = proxy;
+    this._timeout = timeout;
+    this._debug = debug;
+    this._logger = logger;
     this.deferClient = new Promise((resolve, reject) => {
-      soap.createClient(this.options.wsdl, {
+      soap.createClient(wsdl, {
         wsdl_options: {
-          proxy: this.options.proxy,
-          timeout: this.options.timeout
+          proxy,
+          timeout
         }
       }, (err, client) => {
         if (err) {
+          this._logger(`Create client failed. err[${err.message}]`);
           reject(err);
           return;
         }
@@ -74,40 +85,35 @@ class Mengwang {
   }
 
   sendSms(mobiles, content) {
-    let mobileArr;
-    if (_.isArray(mobiles)) {
-      mobileArr = mobiles;
-    } else {
-      mobileArr = [mobiles];
+    if (!_.isArray(mobiles)) {
+      mobiles = [mobiles];
     }
 
-    if (mobileArr.length === 0 || !content) {
+    if (mobiles.length === 0 || !content) {
       return Promise.reject('mobile or content empty');
     }
 
     let logMsg = '';
-    if (this.options.debug) {
-      mobileArr.forEach((mobile, i) => {
-        logMsg = ` ${logMsg}mobile${i + 1}[${mobile}] content[${content}]`;
-      });
+    if (this._debug) {
+      logMsg += `mobile[${mobiles.join(',')}] content[${content}]`;
     }
 
     return this.deferClient.then((client) => {
-      this.options.logger(`Call mengwang sendSms.${logMsg}`);
+      this._logger(`Call mengwang sendSms.${logMsg}`);
       const startTime = Date.now();
 
       return new Promise((resolve, reject) => {
         client.MongateCsSpSendSmsNew({
-          userId: this.options.username,
-          password: this.options.userpass,
-          pszMobis: mobileArr.join(','),
+          userId: this._username,
+          password: this._userpass,
+          pszMobis: mobiles.join(','),
           pszMsg: content,
-          iMobiCount: mobileArr.length,
-          pszSubPort: this.options.pszSubPort
+          iMobiCount: mobiles.length,
+          pszSubPort: this._pszSubPort
         }, (err, result) => {
-          this.options.logger(`Call mengwang complete. elapsedTime[${Date.now() - startTime}]${logMsg}`);
+          this._logger(`Call mengwang complete. elapsedTime[${Date.now() - startTime}]${logMsg}`);
           if (err) {
-            this.options.logger(`Call mengwang sendSms failed. err[${err.message}]${logMsg}`);
+            this._logger(`Call mengwang sendSms failed. err[${err.message}]${logMsg}`);
             reject(err);
             return;
           }
@@ -116,28 +122,28 @@ class Mengwang {
             response = result[0];
           }
 
-          if (this.options.debug) {
-            logMsg = `${logMsg} result[${JSON.stringify(response)}]`;
+          if (this._debug) {
+            logMsg += ` result[${JSON.stringify(response)}]`;
           }
 
           if (response && Math.abs(response.MongateCsSpSendSmsNewResult) > 999) {
-            this.options.logger(`Call mengwang sendSms succ.${logMsg}`);
+            this._logger(`Call mengwang sendSms succ.${logMsg}`);
             resolve(response.MongateCsSpSendSmsNewResult);
           } else {
             let errMsg = 'unknow error';
             if (response && Mengwang.errMap[response.MongateCsSpSendSmsNewResult]) {
               errMsg = Mengwang.errMap[response.MongateCsSpSendSmsNewResult];
             }
-            this.options.logger(`Call mengwang sendSms err. err[${errMsg}]${logMsg}`);
+            this._logger(`Call mengwang sendSms err. err[${errMsg}]${logMsg}`);
             reject(errMsg);
           }
         }, {
-          proxy: this.options.proxy,
-          timeout: this.options.timeout
+          proxy: this._proxy,
+          timeout: this._timeout
         });
       });
     }, (e) => {
-      this.options.logger(`Get mengwang client failed. err[${e.message}]${logMsg}`);
+      this._logger(`Get mengwang client failed. err[${e.message}]${logMsg}`);
       throw e;
     });
   }
