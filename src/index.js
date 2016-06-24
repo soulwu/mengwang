@@ -1,8 +1,5 @@
-/* eslint camelcase:0 */
-
 import soap from 'soap';
 import _ from 'lodash';
-import {isMobilePhone} from 'validator';
 
 class Mengwang {
   static errMap = {
@@ -53,8 +50,6 @@ class Mengwang {
   };
 
   static defaultOptions = {
-    wsdl: 'http://61.145.229.29:9006/MWGate/wmgw.asmx?wsdl',
-    pszSubPort: '*',
     debug: process.env.NODE_DEBUG && /\bmengwang\b/.test(process.env.NODE_DEBUG),
     logger: _.noop
   };
@@ -88,12 +83,6 @@ class Mengwang {
 
     if (mobileArr.length === 0 || !content) {
       return Promise.reject('mobile or content empty');
-    }
-
-    for (const mobile of mobileArr) {
-      if (!isMobilePhone(mobile, 'zh-CN')) {
-        return Promise.reject('mobile invalid');
-      }
     }
 
     let logMsg = '';

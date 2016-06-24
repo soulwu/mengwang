@@ -1,0 +1,5 @@
+extends:
+  - eslint-config-cfp/node
+parser: babel-eslint
+rules:
+  camelcase: 0

@@ -1,24 +1,27 @@
 {
   "name": "mengwang",
-  "description": "Node.js SDK for mengwang sms gateway.",
+  "description": "梦网短信发送接口",
   "main": "lib/index.js",
   "scripts": {
-    "prepublish": "npm run build",
-    "test": "mocha",
-    "build": "babel src --out-dir lib",
-    "clean": "rimraf lib",
+    "build": "babel src -d lib",
     "lint": "eslint src test",
+    "test": "mocha",
+    "prepublish": "npm run build",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/soulwu/mengwang.git"
   },
+  "files": [
+    "lib/*",
+    "package.json",
+    "README.md"
+  ],
   "keywords": [
-    "mengwang",
     "梦网",
-    "sms",
-    "短信"
+    "短信",
+    "接口"
   ],
   "author": "soulwu",
   "license": "MIT",
@@ -31,8 +34,7 @@
   },
   "dependencies": {
     "lodash": "^4.13.1",
-    "soap": "^0.15.0",
-    "validator": "^4.9.0"
+    "soap": "^0.15.0"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
@@ -46,7 +48,6 @@
     "eslint": "^2.12.0",
     "eslint-config-cfp": "^1.8.0",
     "mocha": "^2.5.3",
-    "rimraf": "^2.5.2",
     "semantic-release": "^4.3.5"
   }
 }

@@ -7,6 +7,9 @@ notifications:
   email: false
 node_js:
   - stable
+  - 6
+  - 5
+  - 4
 env:
   - CXX=g++-4.8
 addons:
@@ -19,11 +22,14 @@ before_install:
   - npm i -g npm@^3.0.0
 before_script:
   - npm prune
-  - npm run clean
 script:
   - npm run lint
   - npm test
 after_success:
+  - 'curl -Lo travis_after_all.py https://git.io/travis_after_all'
+  - python travis_after_all.py
+  - export $(cat .to_export_back) &> /dev/null
   - npm run semantic-release
 branches:
-  only: master
+  except:
+    - /^v\d+\.\d+\.\d+$/
